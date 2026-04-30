@@ -1,0 +1,49 @@
+[gd_scene load_steps=3 format=3 uid="uid://supply_crate"]
+
+[ext_resource type="Script" path="res://scripts/supply_crate.gd" id="1_crate"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_crate"]
+size = Vector2(30, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pickup"]
+size = Vector2(80, 80)
+
+[node name="SupplyCrate" type="StaticBody2D"]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_crate")
+
+[node name="Glow" type="ColorRect" parent="."]
+position = Vector2(-20, -20)
+size = Vector2(40, 40)
+color = Color(0.5, 0.5, 0.5, 0.3)
+
+[node name="Body" type="ColorRect" parent="."]
+position = Vector2(-15, -15)
+size = Vector2(30, 30)
+color = Color(0.5, 0.5, 0.5, 1.0)
+
+[node name="Icon" type="Label" parent="."]
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 10.0
+text = "📦"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_crate")
+
+[node name="PickupArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 1
+
+[node name="PickupCollision" type="CollisionShape2D" parent="PickupArea"]
+shape = SubResource("RectangleShape2D_pickup")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="FloatTimer" type="Timer" parent="."]
+wait_time = 2.0
+autostart = true
