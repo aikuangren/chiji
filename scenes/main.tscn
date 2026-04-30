@@ -79,30 +79,50 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_health")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
+# ==== 顶部关卡编号 ====
 [node name="LevelLabel" type="Label" parent="CanvasLayer"]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -50.0
-offset_top = 4.0
-offset_right = 50.0
-offset_bottom = 24.0
+offset_left = -60.0
+offset_top = 6.0
+offset_right = 60.0
+offset_bottom = 30.0
 grow_horizontal = 2
 text = "关卡-1"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(1, 1, 1, 0.8)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 0.6)
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 1, 1, 0.9)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
 theme_override_constants/outline_size = 2
 
+# ==== 右上角退出按钮 ====
+[node name="ExitButton" type="Button" parent="CanvasLayer"]
+anchors_preset = 12
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_top = 6.0
+offset_right = -8.0
+offset_bottom = 32.0
+grow_horizontal = 0
+text = "✕"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 1, 1, 0.8)
+theme_override_styles/normal = StyleBoxEmpty
+theme_override_styles/hover = StyleBoxEmpty
+theme_override_styles/pressed = StyleBoxEmpty
+mouse_filter = 0
+
+# ==== 右上角小地图 ====
 [node name="MinimapContainer" type="MarginContainer" parent="CanvasLayer"]
 anchors_preset = 12
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -200.0
-offset_top = 10.0
+offset_top = 40.0
 offset_right = -10.0
-offset_bottom = 200.0
+offset_bottom = 230.0
 grow_horizontal = 0
 mouse_filter = 2
 
@@ -111,45 +131,48 @@ custom_minimum_size = Vector2(180, 180)
 size = Vector2(180, 180)
 script = ExtResource("4_minimap")
 
+# ==== 小地图下方敌人统计 ====
+[node name="EnemyCountPanel" type="MarginContainer" parent="CanvasLayer"]
+anchors_preset = 12
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_top = 238.0
+offset_right = -10.0
+offset_bottom = 300.0
+grow_horizontal = 0
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/EnemyCountPanel"]
+offset_right = 190.0
+offset_bottom = 62.0
+
+[node name="ShooterLabel" type="Label" parent="CanvasLayer/EnemyCountPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 22)
+text = "● 射击怪: 0"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(1.0, 0.3, 0.3, 1)
+
+[node name="MeleeLabel" type="Label" parent="CanvasLayer/EnemyCountPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 22)
+text = "● 自爆怪: 0"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(1.0, 0.9, 0.2, 1)
+
+# ==== BUFF状态标签（散弹模式）====
 [node name="BuffLabel" type="Label" parent="CanvasLayer"]
 anchors_preset = 12
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -260.0
-offset_top = 90.0
+offset_left = -200.0
+offset_top = 300.0
 offset_right = -10.0
-offset_bottom = 116.0
+offset_bottom = 326.0
 grow_horizontal = 0
 text = ""
 horizontal_alignment = 2
+theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.2, 0.6, 1.0, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
-theme_override_constants/shadow_offset_x = 1
-theme_override_constants/shadow_offset_y = 1
-
-[node name="RegionLabel" type="Label" parent="CanvasLayer"]
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -200.0
-offset_top = 20.0
-offset_right = 200.0
-offset_bottom = 46.0
-grow_horizontal = 2
-text = "区域"
-horizontal_alignment = 1
-
-[node name="CoordsLabel" type="Label" parent="CanvasLayer"]
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -200.0
-offset_top = 50.0
-offset_right = 200.0
-offset_bottom = 76.0
-grow_horizontal = 2
-text = "坐标"
-horizontal_alignment = 1
 
 [node name="HintLabel" type="Label" parent="CanvasLayer"]
 anchors_preset = 7
@@ -158,10 +181,14 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -200.0
-offset_top = -80.0
+offset_top = -40.0
 offset_right = 200.0
-offset_bottom = -54.0
+offset_bottom = -14.0
 grow_horizontal = 2
 grow_vertical = 0
-text = ""
+text = "WASD移动 | O射击 | K近战"
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 0.7)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.4)
+theme_override_constants/outline_size = 1

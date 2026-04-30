@@ -13,12 +13,13 @@ var obstacle_spawner = ObstacleSpawner.new()
 var supply_spawner = SupplySpawner.new()
 var enemy_spawner = EnemySpawner.new()
 
-@onready var region_label: Label = $CanvasLayer/RegionLabel
 @onready var hint_label: Label = $CanvasLayer/HintLabel
-@onready var coords_label: Label = $CanvasLayer/CoordsLabel
 @onready var buff_label: Label = $CanvasLayer/BuffLabel
 @onready var minimap: Control = $CanvasLayer/MinimapContainer/Minimap
 @onready var level_label: Label = $CanvasLayer/LevelLabel
+@onready var shooter_label: Label = $CanvasLayer/EnemyCountPanel/VBoxContainer/ShooterLabel
+@onready var melee_label: Label = $CanvasLayer/EnemyCountPanel/VBoxContainer/MeleeLabel
+@onready var exit_button: Button = $CanvasLayer/ExitButton
 
 # 统计信息
 var kill_shooter: int = 0
@@ -36,10 +37,12 @@ var level_config: Dictionary = {}
 func _ready():
 	randomize()
 	
-	# 读取当前关卡
 	current_level = LevelManager.get_current_level()
 	level_config = LevelManager.get_level_config(current_level)
 	level_label.text = "关卡-%d" % current_level
+	
+	# 退出按钮
+	exit_button.pressed.connect(_on_exit)
 	
 	await get_tree().create_timer(0.5).timeout
 	
@@ -53,7 +56,6 @@ func _ready():
 	for crate in crates:
 		supplies.add_child(crate)
 	
-	# 生成所有区域的敌人
 	enemy_spawner.spawn_all_regions(enemies_node, player.position)
 	
 	await get_tree().process_frame
@@ -62,7 +64,6 @@ func _ready():
 	for enemy in enemy_spawner.get_enemies():
 		if is_instance_valid(enemy):
 			enemy.enemy_killed.connect(_on_enemy_killed)
-			# 设置关卡配置的血量
 			enemy.health = level_config["enemy_health"]
 			enemy.health_bar.max_value = level_config["enemy_health"]
 			enemy.health_bar.value = level_config["enemy_health"]
@@ -73,7 +74,6 @@ func _ready():
 					total_melee += 1
 	
 	player.set_bullet_container(bullets_node)
-	
 	player.player_died.connect(_on_player_died)
 	
 	start_time = Time.get_ticks_msec()
@@ -94,15 +94,11 @@ func _process(_delta: float):
 	_check_victory()
 
 func _update_ui():
-	var region = MapData.get_region_at(player.position.x, player.position.y)
-	var region_name = MapData.REGION_CONFIGS[region]["name"]
-	
 	var alive_shooter = total_shooter - kill_shooter
 	var alive_melee = total_melee - kill_melee
-	var alive_total = alive_shooter + alive_melee
 	
-	region_label.text = "%s | 剩余敌人 %d" % [region_name, alive_total]
-	coords_label.text = "射击: %d  自爆: %d" % [alive_shooter, alive_melee]
+	shooter_label.text = "● 射击怪: %d" % alive_shooter
+	melee_label.text = "● 自爆怪: %d" % alive_melee
 	
 	var buff_text = player.get_buff_status()
 	if buff_text != "":
@@ -115,11 +111,11 @@ func _update_ui():
 	if nearest != null:
 		var dist = player.position.distance_to(nearest.position)
 		if dist < 80:
-			hint_label.text = "按 E 拾取道具"
+			hint_label.text = "按 E 拾取道具 | WASD移动 | O射击 | K近战"
 		else:
-			hint_label.text = "按 空格 打开卡牌游戏 | O射击 | K近战"
+			hint_label.text = "WASD移动 | O射击 | K近战"
 	else:
-		hint_label.text = "按 空格 打开卡牌游戏 | O射击 | K近战"
+		hint_label.text = "WASD移动 | O射击 | K近战"
 	
 	_update_minimap()
 
@@ -158,7 +154,6 @@ func _check_victory():
 	var alive_melee = total_melee - kill_melee
 	
 	if alive_shooter <= 0 and alive_melee <= 0:
-		# 通关！保存记录
 		LevelManager.complete_level(current_level)
 		game_over = true
 		_show_result(ResultPopup.Result.VICTORY)
@@ -177,6 +172,18 @@ func _show_result(result: ResultPopup.Result):
 func _on_player_died():
 	pass
 
+func _on_exit():
+	var dialog = ConfirmationDialog.new()
+	dialog.title = "退出游戏"
+	dialog.dialog_text = "确定要退出当前关卡吗？"
+	dialog.ok_button_text = "确定"
+	dialog.cancel_button_text = "取消"
+	add_child(dialog)
+	dialog.popup_centered()
+	
+	await dialog.confirmed
+	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+
 func _check_nearest_supply():
 	if Input.is_action_just_pressed("interact"):
 		var nearest = supply_spawner.get_nearest_item(player.position)
@@ -186,7 +193,4 @@ func _check_nearest_supply():
 			var effect_text = player.apply_item_effect(item_type)
 			hint_label.text = effect_text
 			await get_tree().create_timer(2.0).timeout
-			hint_label.text = ""
-	
-	if Input.is_action_just_pressed("ui_accept"):
-		get_tree().change_scene_to_file("res://scenes/card_game/card_game_main.tscn")
+			hint_label.text = "WASD移动 | O射击 | K近战"
