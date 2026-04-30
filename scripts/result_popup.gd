@@ -54,4 +54,4 @@ func _on_next_level():
 	get_tree().reload_current_scene()
 
 func _on_main_menu():
-	get_tree().change_scene_to_file("res://scenes/card_game/card_game_main.tscn")
+	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
