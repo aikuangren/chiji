@@ -79,7 +79,6 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_health")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-# ==== 顶部关卡编号 ====
 [node name="LevelLabel" type="Label" parent="CanvasLayer"]
 anchors_preset = 5
 anchor_left = 0.5
@@ -96,25 +95,16 @@ theme_override_colors/font_color = Color(1, 1, 1, 0.9)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
 theme_override_constants/outline_size = 2
 
-# ==== 右上角退出按钮 ====
 [node name="ExitButton" type="Button" parent="CanvasLayer"]
-anchors_preset = 12
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -40.0
+anchors_preset = 9
+anchor_left = 0.0
+anchor_top = 0.0
+offset_left = 8.0
 offset_top = 6.0
-offset_right = -8.0
+offset_right = 34.0
 offset_bottom = 32.0
-grow_horizontal = 0
-text = "✕"
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(1, 1, 1, 0.8)
-theme_override_styles/normal = StyleBoxEmpty
-theme_override_styles/hover = StyleBoxEmpty
-theme_override_styles/pressed = StyleBoxEmpty
-mouse_filter = 0
+grow_vertical = 0
 
-# ==== 右上角小地图 ====
 [node name="MinimapContainer" type="MarginContainer" parent="CanvasLayer"]
 anchors_preset = 12
 anchor_left = 1.0
@@ -131,7 +121,6 @@ custom_minimum_size = Vector2(180, 180)
 size = Vector2(180, 180)
 script = ExtResource("4_minimap")
 
-# ==== 小地图下方敌人统计 ====
 [node name="EnemyCountPanel" type="MarginContainer" parent="CanvasLayer"]
 anchors_preset = 12
 anchor_left = 1.0
@@ -159,7 +148,6 @@ text = "● 自爆怪: 0"
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(1.0, 0.9, 0.2, 1)
 
-# ==== BUFF状态标签（散弹模式）====
 [node name="BuffLabel" type="Label" parent="CanvasLayer"]
 anchors_preset = 12
 anchor_left = 1.0
