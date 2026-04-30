@@ -18,6 +18,7 @@ var enemy_spawner = EnemySpawner.new()
 @onready var coords_label: Label = $CanvasLayer/CoordsLabel
 @onready var buff_label: Label = $CanvasLayer/BuffLabel
 @onready var minimap: Control = $CanvasLayer/MinimapContainer/Minimap
+@onready var level_label: Label = $CanvasLayer/LevelLabel
 
 # 统计信息
 var kill_shooter: int = 0
@@ -28,8 +29,17 @@ var start_time: float = 0.0
 var game_over: bool = false
 var game_initialized: bool = false
 
+# 当前关卡
+var current_level: int = 1
+var level_config: Dictionary = {}
+
 func _ready():
 	randomize()
+	
+	# 读取当前关卡
+	current_level = LevelManager.get_current_level()
+	level_config = LevelManager.get_level_config(current_level)
+	level_label.text = "关卡-%d" % current_level
 	
 	await get_tree().create_timer(0.5).timeout
 	
@@ -38,29 +48,29 @@ func _ready():
 	var region = MapData.get_region_at(player.position.x, player.position.y)
 	obstacle_spawner.spawn_obstacles(obstacles, player.position, region)
 	
-	var crate_count = 6
-	var crates = supply_spawner.spawn_supplies(crate_count)
+	var item_count = level_config["item_count"]
+	var crates = supply_spawner.spawn_supplies(item_count)
 	for crate in crates:
 		supplies.add_child(crate)
 	
-	# 生成所有区域的敌人并统计类型
+	# 生成所有区域的敌人
 	enemy_spawner.spawn_all_regions(enemies_node, player.position)
 	
-	# 等待两帧让所有敌人的 _ready() 初始化完成
 	await get_tree().process_frame
 	await get_tree().process_frame
 	
 	for enemy in enemy_spawner.get_enemies():
 		if is_instance_valid(enemy):
 			enemy.enemy_killed.connect(_on_enemy_killed)
+			# 设置关卡配置的血量
+			enemy.health = level_config["enemy_health"]
+			enemy.health_bar.max_value = level_config["enemy_health"]
+			enemy.health_bar.value = level_config["enemy_health"]
 			match enemy.enemy_type:
 				Enemy.Type.SHOOTER:
 					total_shooter += 1
 				Enemy.Type.MELEE:
 					total_melee += 1
-			print("[DEBUG] 敌人类型: ", enemy.enemy_type, " 位置: ", enemy.position)
-	
-	print("[DEBUG] 总射手: ", total_shooter, " 总自爆: ", total_melee)
 	
 	player.set_bullet_container(bullets_node)
 	
@@ -72,7 +82,7 @@ func _ready():
 	
 	await get_tree().create_timer(0.5).timeout
 	start_time = Time.get_ticks_msec()
-	game_initialized = true  # 标记初始化完成，之后才允许检测胜利
+	game_initialized = true
 
 func _process(_delta: float):
 	if game_over:
@@ -111,7 +121,6 @@ func _update_ui():
 	else:
 		hint_label.text = "按 空格 打开卡牌游戏 | O射击 | K近战"
 	
-	# 更新小地图
 	_update_minimap()
 
 func _update_minimap():
@@ -149,6 +158,8 @@ func _check_victory():
 	var alive_melee = total_melee - kill_melee
 	
 	if alive_shooter <= 0 and alive_melee <= 0:
+		# 通关！保存记录
+		LevelManager.complete_level(current_level)
 		game_over = true
 		_show_result(ResultPopup.Result.VICTORY)
 
@@ -161,7 +172,7 @@ func _show_result(result: ResultPopup.Result):
 	
 	var elapsed = (Time.get_ticks_msec() - start_time) / 1000.0
 	var total_kills = kill_shooter + kill_melee
-	popup.show_result(result, total_kills, elapsed)
+	popup.show_result(result, total_kills, elapsed, current_level)
 
 func _on_player_died():
 	pass

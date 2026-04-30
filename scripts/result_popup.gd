@@ -13,15 +13,17 @@ enum Result { VICTORY, DEFEAT }
 var _result_type: Result
 var _kills: int = 0
 var _time_survived: float = 0.0
+var _level: int = 1
 
 func _ready():
 	hide()
 	panel.modulate.a = 0.0
 
-func show_result(result: Result, kills: int, time_survived: float):
+func show_result(result: Result, kills: int, time_survived: float, level: int = 1):
 	_result_type = result
 	_kills = kills
 	_time_survived = time_survived
+	_level = level
 	
 	match result:
 		Result.VICTORY:
@@ -41,7 +43,7 @@ func show_result(result: Result, kills: int, time_survived: float):
 			close_button.pressed.connect(_on_main_menu)
 	
 	var time_str = "%.1f秒" % time_survived
-	stats_label.text = "击杀: %d\n存活时间: %s" % [kills, time_str]
+	stats_label.text = "关卡: %d\n击杀: %d\n存活时间: %s" % [level, kills, time_str]
 	
 	show()
 	var tween = create_tween()
@@ -51,6 +53,8 @@ func _on_retry():
 	get_tree().reload_current_scene()
 
 func _on_next_level():
+	# 标记下一关，然后重载场景
+	LevelManager.go_to_next_level(_level)
 	get_tree().reload_current_scene()
 
 func _on_main_menu():
