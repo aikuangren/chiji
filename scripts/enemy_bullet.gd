@@ -4,32 +4,31 @@ class_name EnemyBullet
 
 const SPEED = 400.0
 const DAMAGE = 15
-const LIFETIME = 4.0  # 敌人子弹存活更久
+const LIFETIME = 4.0
+const MAX_DISTANCE = 350.0
 
 var velocity: Vector2 = Vector2.ZERO
 var lifetime: float = 0.0
+var origin_pos: Vector2
 
 func _ready():
-	# 设置碰撞层和掩码
-	collision_layer = 32   # 敌人子弹层 (layer 6)
-	collision_mask = 1     # 只与玩家层碰撞 (layer 1)
-	
-	# 连接碰撞信号
+	collision_layer = 32
+	collision_mask = 1
 	body_entered.connect(_on_body_entered)
+	origin_pos = global_position
 
 func _physics_process(delta: float):
-	# 移动子弹
-	position += velocity * delta
+	if origin_pos.distance_to(global_position) > MAX_DISTANCE:
+		queue_free()
+		return
 	
-	# 生命周期计时
+	position += velocity * delta
 	lifetime += delta
 	if lifetime >= LIFETIME:
 		queue_free()
 
 func setup(dir: Vector2) -> void:
-	# 设置子弹方向
 	velocity = dir.normalized() * SPEED
-	# 让子弹朝运动方向旋转
 	rotation = dir.angle()
 
 func _on_body_entered(body: Node2D) -> void:
