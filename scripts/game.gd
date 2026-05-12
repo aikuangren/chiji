@@ -218,12 +218,14 @@ func _update_fog():
 	var fog = $CanvasLayer/Fog
 	if fog and fog.material is ShaderMaterial:
 		if is_instance_valid(player):
-			var camera = get_viewport().get_camera_2d()
+			var viewport = get_viewport()
+			var camera = viewport.get_camera_2d()
 			if camera:
-				# 用 Canvas 变换将世界坐标转为屏幕坐标
-				var canvas_transform = camera.get_canvas_transform()
-				var screen_pos = canvas_transform * player.global_position
-				# 屏幕坐标以视口中心为原点，需要偏移到左上角
-				var viewport_size = get_viewport().get_visible_rect().size
+				var viewport_size = viewport.get_visible_rect().size
+				# 玩家相对于相机的位置（世界坐标差值）
+				var rel_pos = player.global_position - camera.global_position
+				# 考虑缩放 (zoom=2)
+				var screen_pos = rel_pos / camera.zoom
+				# 偏移到视口中心（左上角原点）
 				screen_pos += viewport_size * 0.5
 				fog.material.set_shader_parameter("player_pos", screen_pos)
