@@ -74,6 +74,7 @@ static func get_region_at(x: float, y: float) -> RegionType:
 	return RegionType.PLAINS
 
 # 获取区域的过渡权重 (用于区域边缘混合)
+# 所有区域参与混合，距离越近权重越大，实现平滑过渡
 static func get_region_blend(x: float, y: float) -> Dictionary:
 	var total_weight: float = 0.0
 	var weights: Dictionary = {}
@@ -84,10 +85,11 @@ static func get_region_blend(x: float, y: float) -> Dictionary:
 		var dy = y - region[1]
 		var dist = sqrt(dx * dx + dy * dy)
 		var radius = region[2]
+		var falloff = radius * 1.4  # 过渡范围延伸到区域外40%
 		
 		# 使用 smoothstep 计算权重
-		if dist < radius:
-			var weight = smoothstep(radius, radius * 0.6, dist)
+		if dist < falloff:
+			var weight = smoothstep(falloff, 0.0, dist)  # 中心权重最大，向外递减
 			weights[region_type] = weight
 			total_weight += weight
 	
