@@ -12,7 +12,7 @@ void fragment() {
 	float dist = distance(uv, player_pos);
 	
 	// 在玩家周围圆形区域内透明，外部黑色
-	float alpha = smoothstep(radius + softness, radius - softness, dist);
+	float alpha = smoothstep(radius - softness, radius + softness, dist);
 	alpha = clamp(alpha, 0.0, 1.0);
 	
 	COLOR = vec4(0.0, 0.0, 0.0, alpha);
