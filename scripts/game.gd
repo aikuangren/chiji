@@ -92,6 +92,7 @@ func _process(_delta: float):
 	if game_over:
 		return
 	
+	_update_fog()
 	_update_ui()
 	_check_player_death()
 	_check_victory()
@@ -211,3 +212,12 @@ func _create_map_boundary():
 		body.position = Vector2(wall[0], wall[1])
 		body.add_child(shape)
 		map_boundary.add_child(body)
+
+# 更新战争迷雾 - 传入玩家屏幕位置到着色器
+func _update_fog():
+	var fog = $CanvasLayer/Fog
+	if fog and fog.material is ShaderMaterial:
+		var camera = get_viewport().get_camera_2d()
+		if camera and is_instance_valid(player):
+			var screen_pos = camera.unproject_position(player.global_position)
+			fog.material.set_shader_parameter("player_pos", screen_pos)
