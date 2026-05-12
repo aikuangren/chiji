@@ -8,6 +8,7 @@ const RESULT_POPUP = preload("res://scenes/result_popup.tscn")
 @onready var supplies: Node2D = $Supplies
 @onready var enemies_node: Node2D = $Enemies
 @onready var bullets_node: Node2D = $Bullets
+@onready var map_boundary: Node2D = $MapBoundary
 
 var obstacle_spawner = ObstacleSpawner.new()
 var supply_spawner = SupplySpawner.new()
@@ -41,6 +42,9 @@ func _ready():
 	level_label.text = "关卡-%d" % current_level
 	
 	$CanvasLayer/DamageOverlay.add_to_group("damage_overlay")
+	
+	# 生成地图边界墙
+	_create_map_boundary()
 	
 	exit_button.pressed.connect(_on_exit)
 	
@@ -178,3 +182,32 @@ func _on_exit():
 	
 	await dialog.confirmed
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+
+# 创建地图边界碰撞墙
+func _create_map_boundary():
+	var m = MapData.MAP_SIZE
+	var wall_thickness = 64  # 墙厚度
+	var wall_color = Color(0.5, 0.2, 0.1, 0.6)  # 棕色半透明显示边界
+	
+	# 四面墙的配置：[position_x, position_y, size_x, size_y]
+	var walls = [
+		# 上墙 (y = -m)
+		[0, -m - wall_thickness/2, m * 2 + wall_thickness * 2, wall_thickness],
+		# 下墙 (y = m)
+		[0, m + wall_thickness/2, m * 2 + wall_thickness * 2, wall_thickness],
+		# 左墙 (x = -m)
+		[-m - wall_thickness/2, 0, wall_thickness, m * 2],
+		# 右墙 (x = m)
+		[m + wall_thickness/2, 0, wall_thickness, m * 2],
+	]
+	
+	for wall in walls:
+		var body = StaticBody2D.new()
+		body.collision_layer = 2  # terrain层，与玩家collision_mask匹配
+		var shape = CollisionShape2D.new()
+		var rect = RectangleShape2D.new()
+		rect.size = Vector2(wall[2], wall[3])
+		shape.shape = rect
+		body.position = Vector2(wall[0], wall[1])
+		body.add_child(shape)
+		map_boundary.add_child(body)
