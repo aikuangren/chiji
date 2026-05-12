@@ -1,7 +1,6 @@
 extends Node2D
 
-# 粒子特效类型
-enum Type { HIT, DEATH, EXPLOSION }
+# 粒子特效类型：0=HIT 1=DEATH 2=EXPLOSION
 
 const HIT_COUNT = 6
 const HIT_SPEED = 100.0
@@ -22,7 +21,7 @@ var _particles: Array = []
 var _timer: float = 0.0
 var _ring: ColorRect = null  # 扩散光环
 
-func emit(pos: Vector2, color: Color, effect_type: Type = Type.HIT):
+func emit(pos: Vector2, color: Color, effect_type: int = 0):
 	global_position = pos
 	
 	var count: int
@@ -31,11 +30,11 @@ func emit(pos: Vector2, color: Color, effect_type: Type = Type.HIT):
 	var size: float
 	
 	match effect_type:
-		Type.HIT:
+		0:  # HIT
 			count = HIT_COUNT; speed = HIT_SPEED; lifetime = HIT_LIFETIME; size = HIT_SIZE
-		Type.DEATH:
+		1:  # DEATH
 			count = DEATH_COUNT; speed = DEATH_SPEED; lifetime = DEATH_LIFETIME; size = DEATH_SIZE
-		Type.EXPLOSION:
+		2:  # EXPLOSION
 			count = EXPLOSION_COUNT; speed = EXPLOSION_SPEED; lifetime = EXPLOSION_LIFETIME; size = EXPLOSION_SIZE
 	
 	for i in range(count):
@@ -51,7 +50,7 @@ func emit(pos: Vector2, color: Color, effect_type: Type = Type.HIT):
 		_particles.append(rect)
 	
 	# 爆炸/死亡特效加一个扩散光环
-	if effect_type != Type.HIT:
+	if effect_type != 0:
 		_ring = ColorRect.new()
 		_ring.size = Vector2(4, 4)
 		_ring.color = Color(color.r, color.g, color.b, 0.5)

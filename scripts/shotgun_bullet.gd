@@ -44,4 +44,4 @@ func _spawn_hit_effect():
 	var particle_scene = preload("res://scenes/particle_effect.tscn")
 	var particle = particle_scene.instantiate()
 	get_parent().add_child(particle)
-	particle.emit(global_position, Color(0.3, 0.7, 1.0), ParticleEffect.Type.HIT)
+	particle.emit(global_position, Color(0.3, 0.7, 1.0), 0)
