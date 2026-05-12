@@ -123,7 +123,7 @@ func _explode() -> void:
 	var particle_scene = preload("res://scenes/particle_effect.tscn")
 	var particle = particle_scene.instantiate()
 	get_parent().add_child(particle)
-	particle.emit(global_position, Color(1.0, 0.5, 0.0))
+	particle.emit(global_position, Color(1.0, 0.5, 0.0), ParticleEffect.Type.EXPLOSION)
 	
 	var player = _get_player()
 	if player == null:
@@ -183,4 +183,4 @@ func _spawn_death_particles():
 	var particle = particle_scene.instantiate()
 	get_parent().add_child(particle)
 	var color = Color(1.0, 0.15, 0.15) if enemy_type == Type.SHOOTER else Color(0.5, 0.5, 0.5)
-	particle.emit(global_position, color)
+	particle.emit(global_position, color, ParticleEffect.Type.DEATH)
