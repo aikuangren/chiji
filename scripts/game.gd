@@ -217,7 +217,13 @@ func _create_map_boundary():
 func _update_fog():
 	var fog = $CanvasLayer/Fog
 	if fog and fog.material is ShaderMaterial:
-		var camera = get_viewport().get_camera_2d()
-		if camera and is_instance_valid(player):
-			var screen_pos = camera.unproject_position(player.global_position)
-			fog.material.set_shader_parameter("player_pos", screen_pos)
+		if is_instance_valid(player):
+			var camera = get_viewport().get_camera_2d()
+			if camera:
+				# 用 Canvas 变换将世界坐标转为屏幕坐标
+				var canvas_transform = camera.get_canvas_transform()
+				var screen_pos = canvas_transform * player.global_position
+				# 屏幕坐标以视口中心为原点，需要偏移到左上角
+				var viewport_size = get_viewport().get_visible_rect().size
+				screen_pos += viewport_size * 0.5
+				fog.material.set_shader_parameter("player_pos", screen_pos)
