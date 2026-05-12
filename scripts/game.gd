@@ -21,7 +21,6 @@ var enemy_spawner = EnemySpawner.new()
 @onready var melee_label: Label = $CanvasLayer/EnemyCountPanel/VBoxContainer/MeleeLabel
 @onready var exit_button: Button = $CanvasLayer/ExitButton
 
-# 统计信息
 var kill_shooter: int = 0
 var kill_melee: int = 0
 var total_shooter: int = 0
@@ -30,21 +29,19 @@ var start_time: float = 0.0
 var game_over: bool = false
 var game_initialized: bool = false
 
-# 当前关卡
 var current_level: int = 1
 var level_config: Dictionary = {}
 
 func _ready():
 	randomize()
+	add_to_group("game")
 	
 	current_level = LevelManager.get_current_level()
 	level_config = LevelManager.get_level_config(current_level)
 	level_label.text = "关卡-%d" % current_level
 	
-	# 初始化受击反馈层
 	$CanvasLayer/DamageOverlay.add_to_group("damage_overlay")
 	
-	# 退出按钮
 	exit_button.pressed.connect(_on_exit)
 	
 	await get_tree().create_timer(0.5).timeout
@@ -93,7 +90,6 @@ func _process(_delta: float):
 	
 	_update_ui()
 	_check_player_death()
-	_check_nearest_supply()
 	_check_victory()
 
 func _update_ui():
@@ -110,17 +106,13 @@ func _update_ui():
 	else:
 		buff_label.visible = false
 	
-	var nearest = supply_spawner.get_nearest_item(player.position)
-	if nearest != null:
-		var dist = player.position.distance_to(nearest.position)
-		if dist < 80:
-			hint_label.text = "按 E 拾取道具 | WASD移动 | O射击 | K近战"
-		else:
-			hint_label.text = "WASD移动 | O射击 | K近战"
-	else:
-		hint_label.text = "WASD移动 | O射击 | K近战"
-	
 	_update_minimap()
+
+func show_hint(text: String):
+	hint_label.text = text
+	await get_tree().create_timer(2.0).timeout
+	if hint_label.text == text:
+		hint_label.text = "WASD移动 | O射击 | K近战"
 
 func _update_minimap():
 	var all_enemies = enemy_spawner.get_enemies()
@@ -186,14 +178,3 @@ func _on_exit():
 	
 	await dialog.confirmed
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
-
-func _check_nearest_supply():
-	if Input.is_action_just_pressed("interact"):
-		var nearest = supply_spawner.get_nearest_item(player.position)
-		if nearest != null and is_instance_valid(nearest) and player.position.distance_to(nearest.position) < 80:
-			var item_type = nearest.collect()
-			supply_spawner.spawned_items.erase(nearest)
-			var effect_text = player.apply_item_effect(item_type)
-			hint_label.text = effect_text
-			await get_tree().create_timer(2.0).timeout
-			hint_label.text = "WASD移动 | O射击 | K近战"

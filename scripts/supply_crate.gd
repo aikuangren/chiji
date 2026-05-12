@@ -5,6 +5,7 @@ extends StaticBody2D
 var config: Dictionary
 var base_y: float
 var float_offset: float = 0.0
+var _collected: bool = false
 
 func _ready():
 	config = SupplyData.get_config(item_type)
@@ -15,6 +16,7 @@ func _ready():
 	float_offset = randf() * TAU
 	
 	$FloatTimer.timeout.connect(_on_float_timer)
+	$PickupArea.body_entered.connect(_on_pickup_area_entered)
 
 func _apply_appearance():
 	var body = $Body
@@ -43,15 +45,26 @@ func _on_float_timer():
 	tween.tween_property($Glow, "color:a", 0.3, 0.5)
 	tween.tween_property($Glow, "color:a", 0.5, 0.5)
 
-# 拾取道具 - 返回道具类型供调用者处理效果
-func collect() -> SupplyData.ItemType:
-	if not is_instance_valid(self):
-		return -1
+# 玩家碰撞检测 - 自动拾取
+func _on_pickup_area_entered(body: Node2D):
+	if _collected:
+		return
 	
-	# 播放收集动画
-	var tween = create_tween()
-	tween.tween_property(self, "scale", Vector2(1.5, 1.5), 0.2)
-	tween.parallel().tween_property(self, "modulate:a", 0.0, 0.3)
-	tween.tween_callback(func(): queue_free())
-	
-	return item_type
+	if body is Player:
+		_collected = true
+		# 应用道具效果
+		var effect_text = _apply_effect(body)
+		# 播放收集动画
+		var tween = create_tween()
+		tween.tween_property(self, "scale", Vector2(1.5, 1.5), 0.2)
+		tween.parallel().tween_property(self, "modulate:a", 0.0, 0.3)
+		tween.tween_callback(func(): queue_free())
+		
+		# 显示拾取提示（通过game.gd的hint_label）
+		if effect_text != "":
+			var game = get_tree().get_first_node_in_group("game")
+			if game and game.has_method("show_hint"):
+				game.show_hint(effect_text)
+
+func _apply_effect(player: Player) -> String:
+	return player.apply_item_effect(item_type)
