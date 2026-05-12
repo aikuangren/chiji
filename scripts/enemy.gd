@@ -119,6 +119,12 @@ func _explode() -> void:
 		return
 	is_dead = true
 	
+	# 爆炸粒子特效
+	var particle_scene = preload("res://scenes/particle_effect.tscn")
+	var particle = particle_scene.instantiate()
+	get_parent().add_child(particle)
+	particle.emit(global_position, Color(1.0, 0.5, 0.0))
+	
 	var player = _get_player()
 	if player == null:
 		queue_free()
@@ -157,10 +163,24 @@ func take_damage(dmg: float) -> void:
 	health -= dmg
 	if health_bar:
 		health_bar.value = health
+	
+	# 受击反馈：敌人闪白
+	var tween = create_tween()
+	tween.tween_method(func(v): modulate.a = v, 0.3, 1.0, 0.12)
+	
 	if health <= 0 and not is_dead:
 		is_dead = true
 		die()
 
 func die() -> void:
+	# 死亡粒子特效
+	_spawn_death_particles()
 	enemy_killed.emit(enemy_type)
 	queue_free()
+
+func _spawn_death_particles():
+	var particle_scene = preload("res://scenes/particle_effect.tscn")
+	var particle = particle_scene.instantiate()
+	get_parent().add_child(particle)
+	var color = Color(1.0, 0.15, 0.15) if enemy_type == Type.SHOOTER else Color(0.5, 0.5, 0.5)
+	particle.emit(global_position, color)

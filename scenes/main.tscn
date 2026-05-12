@@ -79,6 +79,14 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_health")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
+[node name="DamageOverlay" type="ColorRect" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.8, 0, 0, 0)
+mouse_filter = 2
+show_behind_parent = true
+
 [node name="LevelLabel" type="Label" parent="CanvasLayer"]
 anchors_preset = 5
 anchor_left = 0.5

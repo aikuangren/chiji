@@ -248,6 +248,18 @@ func take_damage(dmg: float) -> void:
 	health -= dmg
 	health_bar.value = health
 	print("玩家受伤! 剩余血量: ", health)
+	
+	# 受击反馈：屏幕红色闪烁
+	var overlay = get_tree().get_first_node_in_group("damage_overlay")
+	if overlay:
+		var tween = create_tween()
+		tween.tween_property(overlay, "color:a", 0.25, 0.0)
+		tween.tween_property(overlay, "color:a", 0.0, 0.2)
+	
+	# 受击反馈：主角闪白
+	var tween2 = create_tween()
+	tween2.tween_method(func(v): modulate.a = v, 0.5, 1.0, 0.15)
+	
 	if health <= 0:
 		_die()
 

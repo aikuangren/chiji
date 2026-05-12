@@ -41,6 +41,9 @@ func _ready():
 	level_config = LevelManager.get_level_config(current_level)
 	level_label.text = "关卡-%d" % current_level
 	
+	# 初始化受击反馈层
+	$CanvasLayer/DamageOverlay.add_to_group("damage_overlay")
+	
 	# 退出按钮
 	exit_button.pressed.connect(_on_exit)
 	

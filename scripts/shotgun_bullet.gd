@@ -36,5 +36,12 @@ func setup(dir: Vector2) -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if body is Enemy:
 		body.take_damage(DAMAGE)
+		_spawn_hit_effect()
 		hit_enemy.emit(body)
 		queue_free()
+
+func _spawn_hit_effect():
+	var particle_scene = preload("res://scenes/particle_effect.tscn")
+	var particle = particle_scene.instantiate()
+	get_parent().add_child(particle)
+	particle.emit(global_position, Color(0.3, 0.7, 1.0))
