@@ -19,25 +19,31 @@ func _ready():
 	$PickupArea.body_entered.connect(_on_pickup_area_entered)
 
 func _apply_appearance():
-	var body = $Body
-	var glow = $Glow
-	
-	body.color = config["color"]
-	glow.color = config["glow_color"]
-	
-	var size = config["size"]
-	body.size = size
-	glow.size = size + Vector2(8, 8)
+	# 隐藏旧视觉节点，改用 _draw 统一绘制
+	$Body.visible = false
+	$Glow.visible = false
+	$Icon.visible = false
 	
 	var collision = $CollisionShape2D
 	if collision.shape:
-		collision.shape.size = size
+		collision.shape.size = config["size"]
 	
-	# 隐藏旧图标，改用自定义绘制
-	$Icon.visible = false
 	queue_redraw()
 
 func _draw():
+	var size = config["size"]
+	var glow_color = config["glow_color"]
+	var body_color = config["color"]
+	var s = size * 0.5
+	
+	# 绘制发光层（稍大一圈）
+	var glow_rect = Rect2(-s.x - 4, -s.y - 4, size.x + 8, size.y + 8)
+	draw_rect(glow_rect, glow_color)
+	
+	# 绘制主体方块
+	var body_rect = Rect2(-s.x, -s.y, size.x, size.y)
+	draw_rect(body_rect, body_color)
+	
 	# 根据道具类型绘制图标
 	match item_type:
 		SupplyData.ItemType.HEAL:
@@ -48,7 +54,7 @@ func _draw():
 # 绘制治疗十字（红色十字 + 白色方块背景）
 func _draw_heal_icon():
 	var cross_color = Color(0.9, 0.15, 0.15, 1.0)
-	var s = config["size"].x * 0.5  # 半径
+	var s = config["size"].x * 0.5  # 半径（取宽度的一半）
 	
 	# 垂直条（粗十字）
 	var v_bar = Rect2(-s * 0.2, -s * 0.7, s * 0.4, s * 1.4)
