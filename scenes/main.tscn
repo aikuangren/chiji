@@ -1,10 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://chiji_main"]
+[gd_scene load_steps=6 format=3 uid="uid://chiji_main"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/game.gd" id="2_game"]
 [ext_resource type="Script" path="res://scripts/map_renderer.gd" id="3_map_renderer"]
 [ext_resource type="Script" path="res://scripts/minimap.gd" id="4_minimap"]
-[ext_resource type="Shader" path="res://shaders/fog.gdshader" id="5_fog_shader"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 12.0
@@ -15,11 +14,6 @@ corner_radius_top_left = 2
 corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_fog"]
-shader = ExtResource("5_fog_shader")
-shader_parameter/radius = 350.0
-shader_parameter/softness = 80.0
 
 [node name="Main" type="Node2D"]
 script = ExtResource("2_game")
@@ -86,15 +80,6 @@ theme_override_colors/fill_color = Color(0.2, 0.8, 0.2, 1)
 theme_override_styles/fill = SubResource("StyleBoxFlat_health")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-
-[node name="Fog" type="ColorRect" parent="CanvasLayer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color(0, 0, 0, 1)
-mouse_filter = 2
-material = SubResource("ShaderMaterial_fog")
-z_index = 10
 
 [node name="DamageOverlay" type="ColorRect" parent="CanvasLayer"]
 anchors_preset = 15
