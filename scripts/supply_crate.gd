@@ -45,43 +45,36 @@ func _draw():
 		SupplyData.ItemType.SHOTGUN:
 			_draw_shotgun_icon()
 
-# 绘制治疗十字
+# 绘制治疗十字（红色十字 + 白色方块背景）
 func _draw_heal_icon():
-	var color = Color(0.8, 1.0, 0.8, 1.0)
+	var cross_color = Color(0.9, 0.15, 0.15, 1.0)
 	var s = config["size"].x * 0.5  # 半径
 	
-	# 垂直条
-	var v_bar = Rect2(-s * 0.2, -s * 0.9, s * 0.4, s * 1.8)
-	draw_rect(v_bar, color)
-	# 水平条
-	var h_bar = Rect2(-s * 0.9, -s * 0.2, s * 1.8, s * 0.4)
-	draw_rect(h_bar, color)
+	# 垂直条（粗十字）
+	var v_bar = Rect2(-s * 0.2, -s * 0.7, s * 0.4, s * 1.4)
+	draw_rect(v_bar, cross_color)
+	# 水平条（粗十字）
+	var h_bar = Rect2(-s * 0.7, -s * 0.2, s * 1.4, s * 0.4)
+	draw_rect(h_bar, cross_color)
 
-# 绘制散弹图标 - 三个小圆点扇形
+# 绘制散弹图标 - 品字形三角符号
 func _draw_shotgun_icon():
-	var color = Color(0.6, 0.85, 1.0, 1.0)
-	var s = config["size"].x * 0.5  # 半径
+	var tri_color = Color(0.9, 0.95, 1.0, 1.0)
+	var s = config["size"].x * 0.5
 	
-	# 三个圆点：中心、左上、右上（扇形排列）
-	var dot_radius = s * 0.25
-	var offset = s * 0.55
+	# 三个品字形排列的小方块（上1下2）
+	var dot_size = s * 0.3
+	var gap = s * 0.35
 	
-	# 中心圆点
-	draw_circle(Vector2(0, 0), dot_radius, color)
-	# 左上
-	draw_circle(Vector2(-offset, -offset * 0.6), dot_radius * 0.8, color)
-	# 右上
-	draw_circle(Vector2(offset, -offset * 0.6), dot_radius * 0.8, color)
-	
-	# 三条短辐射线（从中心向外）
-	var line_len = s * 0.35
-	var line_width = 1.5
-	var angles = [0.0, -0.6, 0.6]  # 弧度偏移
-	for a in angles:
-		var dir = Vector2(sin(a), -cos(a))  # 向上扇形
-		var start = dir * (dot_radius + 1)
-		var end = dir * (dot_radius + 1 + line_len)
-		draw_line(start, end, color, line_width)
+	# 上方
+	var top = Rect2(-dot_size/2, -gap - dot_size/2, dot_size, dot_size)
+	draw_rect(top, tri_color)
+	# 左下方
+	var left = Rect2(-gap - dot_size/2, gap - dot_size/2, dot_size, dot_size)
+	draw_rect(left, tri_color)
+	# 右下方
+	var right = Rect2(gap - dot_size/2, gap - dot_size/2, dot_size, dot_size)
+	draw_rect(right, tri_color)
 
 func _process(delta):
 	var float_amplitude = 3.0

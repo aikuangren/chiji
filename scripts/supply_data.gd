@@ -12,8 +12,8 @@ const ITEM_CONFIGS = {
 	ItemType.HEAL: {
 		"name": "治疗药包",
 		"desc": "回复20%生命值",
-		"color": Color(0.2, 0.8, 0.2, 1.0),
-		"glow_color": Color(0.2, 0.8, 0.2, 0.4),
+		"color": Color(0.95, 0.95, 0.95, 1.0),  # 白色方块
+		"glow_color": Color(0.8, 0.8, 0.8, 0.3),
 		"icon": "+",
 		"size": Vector2(24, 24),
 		"spawn_weight": 40,
