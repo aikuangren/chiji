@@ -28,19 +28,10 @@ func _physics_process(delta: float):
 	lifetime += delta
 	if lifetime >= LIFETIME:
 		queue_free()
-	queue_redraw()
 
 func setup(dir: Vector2) -> void:
 	velocity = dir.normalized() * SPEED
 	rotation = dir.angle()
-
-func _draw():
-	# 蓝色发光小方块 — 中心亮蓝，外围发光
-	# 核心
-	draw_circle(Vector2.ZERO, 3.0, Color(0.4, 0.8, 1.0, 1.0))
-	# 发光层（半透明扩散）
-	draw_circle(Vector2.ZERO, 5.0, Color(0.3, 0.6, 1.0, 0.3))
-	draw_circle(Vector2.ZERO, 7.0, Color(0.2, 0.4, 1.0, 0.1))
 
 func _on_body_entered(body: Node2D) -> void:
 	if body is Enemy:
