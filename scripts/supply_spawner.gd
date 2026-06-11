@@ -4,13 +4,14 @@ const ITEM_SCENE = preload("res://scenes/supply_crate.tscn")
 const MAP_SIZE = MapData.MAP_SIZE
 const SPAWN_MARGIN = 100
 const MIN_DISTANCE_BETWEEN_ITEMS = 150
+const ITEM_CLEARANCE = 48.0
 
 var spawned_items: Array = []
 
 func spawn_supplies(total_count: int = 30) -> Array:
 	var items: Array = []
 	var attempts = 0
-	var max_attempts = total_count * 10
+	var max_attempts = total_count * 40
 	
 	while items.size() < total_count and attempts < max_attempts:
 		attempts += 1
@@ -64,6 +65,9 @@ func _get_random_position_in_circle(center: Vector2, radius: float) -> Vector2:
 	return center + Vector2(cos(angle), sin(angle)) * r
 
 func _is_position_valid(pos: Vector2, existing_items: Array) -> bool:
+	if not MapTileData.is_world_position_walkable(pos, ITEM_CLEARANCE):
+		return false
+	
 	for item in existing_items:
 		if item is Node2D:
 			if pos.distance_to(item.position) < MIN_DISTANCE_BETWEEN_ITEMS:

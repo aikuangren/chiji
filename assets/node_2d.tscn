@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cjq21438xa1xs"]
+
+[ext_resource type="TileSet" uid="uid://o6gtamu3po6t" path="res://assets/kenney_tileset.tres" id="1_nyviw"]
+
+[node name="Node2D" type="TileMapLayer" unique_id=798701404]
+tile_set = ExtResource("1_nyviw")

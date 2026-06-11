@@ -6,6 +6,10 @@ var enemy_scene: PackedScene = preload("res://scenes/enemy.tscn")
 var enemies: Array[Enemy] = []
 
 const ENEMY_COUNT_PER_REGION = 5  # 每个区域5个敌人
+const ENEMY_CLEARANCE = 48.0
+const MIN_DISTANCE_FROM_PLAYER = 180.0
+const MIN_DISTANCE_BETWEEN_ENEMIES = 120.0
+const MAX_SPAWN_ATTEMPTS_PER_ENEMY = 40
 
 func _init():
 	# 确保enemy场景存在
@@ -75,14 +79,9 @@ func spawn_enemies(container: Node2D, player_pos: Vector2, region: int) -> Array
 	var center = Vector2(region_data[0], region_data[1])
 	var radius = region_data[2]
 	
-	# 在该区域内生成敌人
 	for i in range(ENEMY_COUNT_PER_REGION):
-		var angle = randf() * TAU  # 0 到 2*PI 的随机角度
-		var distance = randf() * radius * 0.8  # 80%半径范围内
-		var spawn_pos = center + Vector2(cos(angle), sin(angle)) * distance
-		
-		# 确保不在玩家附近生成
-		if spawn_pos.distance_to(player_pos) < 150:
+		var spawn_pos = _find_valid_spawn_position(center, radius, player_pos)
+		if spawn_pos == Vector2.INF:
 			continue
 		
 		var enemy = enemy_scene.instantiate()
@@ -109,3 +108,29 @@ func _get_region_center_and_radius(region_type: int) -> Array:
 		if region[3] == region_type:
 			return [region[0], region[1], region[2]]
 	return [0, 0, 400]
+
+func _find_valid_spawn_position(center: Vector2, radius: float, player_pos: Vector2) -> Vector2:
+	for attempt in range(MAX_SPAWN_ATTEMPTS_PER_ENEMY):
+		var angle = randf() * TAU
+		var distance = randf() * radius * 0.8
+		var spawn_pos = center + Vector2(cos(angle), sin(angle)) * distance
+		
+		if not _is_spawn_position_valid(spawn_pos, player_pos):
+			continue
+		
+		return spawn_pos
+	
+	return Vector2.INF
+
+func _is_spawn_position_valid(spawn_pos: Vector2, player_pos: Vector2) -> bool:
+	if spawn_pos.distance_to(player_pos) < MIN_DISTANCE_FROM_PLAYER:
+		return false
+	
+	if not MapTileData.is_world_position_walkable(spawn_pos, ENEMY_CLEARANCE):
+		return false
+	
+	for enemy in enemies:
+		if is_instance_valid(enemy) and enemy.position.distance_to(spawn_pos) < MIN_DISTANCE_BETWEEN_ENEMIES:
+			return false
+	
+	return true

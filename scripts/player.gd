@@ -86,13 +86,13 @@ func _draw():
 func _physics_process(delta):
 	var move_dir = Vector2.ZERO
 	
-	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
+	if Input.is_action_pressed("move_up"):
 		move_dir.y -= 1
-	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
+	if Input.is_action_pressed("move_down"):
 		move_dir.y += 1
-	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+	if Input.is_action_pressed("move_left"):
 		move_dir.x -= 1
-	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+	if Input.is_action_pressed("move_right"):
 		move_dir.x += 1
 	
 	if move_dir.length() > 0:
@@ -178,13 +178,13 @@ func _update_shotgun_mode(delta: float):
 		shotgun_timer = 0.0
 
 func _handle_attack_input():
-	if Input.is_key_pressed(KEY_O):
+	if Input.is_action_pressed("attack_ranged"):
 		var cooldown = SHOTGUN_COOLDOWN if is_shotgun_mode else SHOOT_COOLDOWN
 		if shoot_cooldown <= 0.0:
 			_shoot()
 			shoot_cooldown = cooldown
 	
-	if Input.is_key_pressed(KEY_K):
+	if Input.is_action_pressed("attack_melee"):
 		if melee_cooldown <= 0.0:
 			_melee_attack()
 			melee_cooldown = MELEE_COOLDOWN

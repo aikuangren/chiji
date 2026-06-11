@@ -52,8 +52,8 @@ func _ready():
 	
 	player.position = Vector2(0, 0)
 	
-	var region = MapData.get_region_at(player.position.x, player.position.y)
-	obstacle_spawner.spawn_obstacles(obstacles, player.position, region)
+	# 瓦片地图已经提供地形阻挡，先关闭旧随机障碍，避免视觉和碰撞重复。
+	obstacle_spawner.clear_all()
 	
 	var item_count = level_config["item_count"]
 	var crates = supply_spawner.spawn_supplies(item_count)
@@ -100,8 +100,8 @@ func _update_ui():
 	var alive_shooter = total_shooter - kill_shooter
 	var alive_melee = total_melee - kill_melee
 	
-	shooter_label.text = "● 射击怪: %d" % alive_shooter
-	melee_label.text = "● 自爆怪: %d" % alive_melee
+	shooter_label.text = "☠ 剩余敌人 %d" % [alive_shooter + alive_melee]
+	melee_label.text = "◎ 目标点 %d" % [total_shooter + total_melee]
 	
 	var buff_text = player.get_buff_status()
 	if buff_text != "":
@@ -173,15 +173,27 @@ func _on_player_died():
 
 func _on_exit():
 	var dialog = ConfirmationDialog.new()
-	dialog.title = "退出游戏"
-	dialog.dialog_text = "确定要退出当前关卡吗？"
-	dialog.ok_button_text = "确定"
-	dialog.cancel_button_text = "取消"
+	dialog.title = "暂停"
+	dialog.dialog_text = "是否返回主菜单？"
+	dialog.ok_button_text = "返回菜单"
+	dialog.cancel_button_text = "继续游戏"
+	dialog.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(dialog)
 	dialog.popup_centered()
 	
-	await dialog.confirmed
-	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+	get_tree().paused = true
+	dialog.confirmed.connect(func():
+		get_tree().paused = false
+		get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+	)
+	dialog.canceled.connect(func():
+		get_tree().paused = false
+		dialog.queue_free()
+	)
+	dialog.close_requested.connect(func():
+		get_tree().paused = false
+		dialog.queue_free()
+	)
 
 # 创建地图边界碰撞墙
 func _create_map_boundary():
